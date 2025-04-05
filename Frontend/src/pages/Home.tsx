@@ -154,7 +154,7 @@ const Home: React.FC = () => {
         ) : notes.length > 0 ? (
           <Row gutter={[16, 16]}>
             {notes.map((note) => (
-              <Col xs={24} sm={12} md={8} lg={6} key={note.id}>
+              <Col xs={24} sm={12} md={8} lg={6} key={note._id}>
                 <NoteCard {...note} />
               </Col>
             ))}

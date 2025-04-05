@@ -1,11 +1,13 @@
 import React from 'react';
-import { Card, Typography, Space } from 'antd';
+import { Card, Typography, Space, Row, Button } from 'antd';
 import { CalendarOutlined } from '@ant-design/icons';
+import { DeleteIcon, Trash2Icon } from 'lucide-react';
+import axios from 'axios';
 
 const { Title, Text } = Typography;
 
 export interface NoteProps {
-  id: string;
+_id: string;
   title: string;
   content: string;
   createdAt: string;
@@ -19,7 +21,21 @@ const categoryColors = {
   'personal': 'category-purple'
 };
 
-const NoteCard: React.FC<NoteProps> = ({ title, content, createdAt, category, image }) => {
+  const deleteNote= async (noteId)=> {
+
+    try {
+      const response = await axios.delete(`http://localhost:3000/notes/${noteId}`);
+      if (response.status === 204) {
+        console.log('Note deleted successfully!');
+      } else {
+        console.error('Failed to delete note.');
+      }
+    } catch (error) {
+      console.error('Error deleting note:', error);
+    }
+  }
+
+const NoteCard: React.FC<NoteProps> = ({_id, title, content, createdAt, category, image }) => {
   return (
     <Card 
       className="note-card rounded-lg overflow-hidden h-full"
@@ -46,6 +62,13 @@ const NoteCard: React.FC<NoteProps> = ({ title, content, createdAt, category, im
         
         <Text className="line-clamp-3">{content}</Text>
       </Space>
+      <br></br>
+      <br></br>
+      <Row>
+        <Button onClick={()=>{
+          deleteNote(_id)
+        }} icon={<Trash2Icon size={15}/>}/>
+      </Row>
     </Card>
   );
 };

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Modal, Form, Input, Button, Select, message } from 'antd';
-
+import axios from 'axios';
 const { TextArea } = Input;
 const { Option } = Select;
 
@@ -16,31 +16,28 @@ const AddNoteModal: React.FC<AddNoteModalProps> = ({ visible, onCancel, onAddNot
 
   const handleSubmit = async () => {
     try {
-      const values = await form.validateFields();
       setLoading(true);
-
-      // Simulate API request
-      setTimeout(() => {
-        const newNote = {
-          id: Date.now().toString(),
-          title: values.title,
-          description: values.description,
-          category: values.category,
-          date: new Date().toLocaleDateString('en-US', { 
-            year: 'numeric', 
-            month: 'short', 
-            day: 'numeric' 
-          }),
-        };
-
-        onAddNote(newNote);
-        setLoading(false);
+      const values = await form.validateFields();
+      const bodyData = {
+        title: values.title,
+        content: values.content,
+        authorId:"NitishKumar",
+      }
+      const response = await axios.post('http://localhost:3000/notes', bodyData);
+      if (response.status === 201) {
         message.success('Note added successfully!');
-        form.resetFields();
-        onCancel();
-      }, 1000);
+      }
+      else{
+        message.error('Failed to add note. Please try again.');
+      }
+      onCancel();
+      onAddNote(response.data);
+      form.resetFields();
+      console.log('Form values:', values);
+      setLoading(false);
     } catch (error) {
       console.error('Validation failed:', error);
+      setLoading(false);
     }
   };
 
@@ -67,23 +64,11 @@ const AddNoteModal: React.FC<AddNoteModalProps> = ({ visible, onCancel, onAddNot
         </Form.Item>
 
         <Form.Item
-          name="description"
-          label="Description"
-          rules={[{ required: true, message: 'Please enter a description' }]}
+          name="content"
+          label="Content"
+          rules={[{ required: true, message: 'Please enter a content' }]}
         >
-          <TextArea rows={4} placeholder="Enter note description" />
-        </Form.Item>
-
-        <Form.Item
-          name="category"
-          label="Category"
-          rules={[{ required: true, message: 'Please select a category' }]}
-        >
-          <Select placeholder="Select a category">
-            <Option value="projects">Projects</Option>
-            <Option value="business">Business</Option>
-            <Option value="personal">Personal</Option>
-          </Select>
+          <TextArea rows={4} placeholder="Enter note content" />
         </Form.Item>
 
         <Form.Item className="mb-0 flex justify-end">
