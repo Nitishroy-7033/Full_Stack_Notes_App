@@ -4,7 +4,7 @@ const connectDB = require("./config/db");
 const noteRoutes = require("./routes/noteRoutes");
 const requestHandlerRoutes = require("./routes/requestHandlerRoutes");
 const userRoutes = require("./routes/userRoutes");
-
+const authHandler = require("./auth/authHandler");
 // Connect to database
 connectDB();
 
@@ -19,7 +19,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Routes
-app.use("/notes", noteRoutes);
+app.use("/notes",authHandler, noteRoutes);
 app.use("/log", requestHandlerRoutes);
 app.use("/users", userRoutes);
 
