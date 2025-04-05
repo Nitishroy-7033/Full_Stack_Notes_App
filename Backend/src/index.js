@@ -3,6 +3,7 @@ const cors = require('cors'); // 👉 Import CORS
 const connectDB = require("./config/db");
 const noteRoutes = require("./routes/noteRoutes");
 const requestHandlerRoutes = require("./routes/requestHandlerRoutes");
+const userRoutes = require("./routes/userRoutes");
 
 // Connect to database
 connectDB();
@@ -20,6 +21,7 @@ app.use(express.urlencoded({ extended: true }));
 // Routes
 app.use("/notes", noteRoutes);
 app.use("/log", requestHandlerRoutes);
+app.use("/users", userRoutes);
 
 // Start server
 app.listen(3000, () => {
