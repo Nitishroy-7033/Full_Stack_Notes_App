@@ -7,8 +7,8 @@ const { Title, Text } = Typography;
 export interface NoteProps {
   id: string;
   title: string;
-  description: string;
-  date: string;
+  content: string;
+  createdAt: string;
   category: 'projects' | 'business' | 'personal';
   image?: string;
 }
@@ -19,7 +19,7 @@ const categoryColors = {
   'personal': 'category-purple'
 };
 
-const NoteCard: React.FC<NoteProps> = ({ title, description, date, category, image }) => {
+const NoteCard: React.FC<NoteProps> = ({ title, content, createdAt, category, image }) => {
   return (
     <Card 
       className="note-card rounded-lg overflow-hidden h-full"
@@ -41,10 +41,10 @@ const NoteCard: React.FC<NoteProps> = ({ title, description, date, category, ima
       <Space direction="vertical" className="w-full" size={12}>
         <div className="flex text-gray-500 text-sm items-center">
           <CalendarOutlined className="mr-1" />
-          <Text type="secondary">{date}</Text>
+          <Text type="secondary">{createdAt}</Text>
         </div>
         
-        <Text className="line-clamp-3">{description}</Text>
+        <Text className="line-clamp-3">{content}</Text>
       </Space>
     </Card>
   );

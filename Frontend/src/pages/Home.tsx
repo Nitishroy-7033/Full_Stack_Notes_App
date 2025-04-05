@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import { 
   Layout, 
   Input, 
@@ -19,54 +20,6 @@ import AddNoteModal from '../components/AddNoteModal';
 
 const { Header, Content } = Layout;
 const { Title } = Typography;
-
-const sampleNotes: NoteProps[] = [
-  {
-    id: '1',
-    title: 'Project Roadmap',
-    description: 'Outline for the next sprint and key milestones for Q2. Need to assign tasks to team members.',
-    date: 'Apr 2, 2025',
-    category: 'projects',
-    image: 'https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?auto=format&fit=crop&q=80&w=600'
-  },
-  {
-    id: '2',
-    title: 'Meeting Notes',
-    description: 'Summary of the client meeting - they want to implement new features by the end of the month.',
-    date: 'Apr 3, 2025',
-    category: 'business'
-  },
-  {
-    id: '3',
-    title: 'Shopping List',
-    description: 'Remember to buy: milk, eggs, bread, and coffee for the weekend.',
-    date: 'Apr 1, 2025',
-    category: 'personal'
-  },
-  {
-    id: '4',
-    title: 'Book Recommendations',
-    description: 'List of books to read this summer: "Atomic Habits", "Deep Work", "The Psychology of Money".',
-    date: 'Mar 28, 2025',
-    category: 'personal',
-    image: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&q=80&w=600'
-  },
-  {
-    id: '5',
-    title: 'Website Redesign',
-    description: 'Ideas for the landing page update - more white space, simplified navigation, new testimonials section.',
-    date: 'Mar 25, 2025',
-    category: 'projects'
-  },
-  {
-    id: '6',
-    title: 'Quarterly Budget',
-    description: 'Financial review for Q1 and projections for Q2. Need to schedule a meeting with the finance team.',
-    date: 'Mar 20, 2025',
-    category: 'business',
-    image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&q=80&w=600'
-  }
-];
 
 const Home: React.FC = () => {
   const [notes, setNotes] = useState<NoteProps[]>([]);
@@ -91,14 +44,12 @@ const Home: React.FC = () => {
     
     // Simulate loading notes from API
     setTimeout(() => {
-      setNotes(sampleNotes);
-      setFilteredNotes(sampleNotes);
+   
       setLoading(false);
     }, 1000);
   }, [navigate]);
 
   useEffect(() => {
-    // Filter notes based on category and search term
     let result = notes;
     
     if (category !== 'all') {
@@ -109,7 +60,7 @@ const Home: React.FC = () => {
       const term = searchTerm.toLowerCase();
       result = result.filter(note => 
         note.title.toLowerCase().includes(term) || 
-        note.description.toLowerCase().includes(term)
+        note.content.toLowerCase().includes(term)
       );
     }
     
@@ -125,9 +76,25 @@ const Home: React.FC = () => {
     localStorage.removeItem('user');
     navigate('/login');
   };
+  const fetchNotes = async () => {
+    try {
+      const response = await axios.get('http://localhost:3000/notes');
+      const notes = response.data;
+      setNotes(notes);
+      console.log("Fetched Notes:", notes);
+      return notes;
+    } catch (error) {
+      console.error("Failed to fetch notes:", error);
+      return [];
+    }
+  };
+  useEffect(() => {
+      fetchNotes();
+  }, []);
 
   if (!user) return null;
-
+  
+  
   return (
     <Layout className="min-h-screen bg-gray-50">
       <Header className="bg-white px-4 md:px-8 flex items-center justify-between shadow-sm h-16">
@@ -184,9 +151,9 @@ const Home: React.FC = () => {
           <div className="flex justify-center items-center py-20">
             <Spin size="large" />
           </div>
-        ) : filteredNotes.length > 0 ? (
+        ) : notes.length > 0 ? (
           <Row gutter={[16, 16]}>
-            {filteredNotes.map((note) => (
+            {notes.map((note) => (
               <Col xs={24} sm={12} md={8} lg={6} key={note.id}>
                 <NoteCard {...note} />
               </Col>
