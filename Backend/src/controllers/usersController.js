@@ -19,7 +19,6 @@ const createUser = async (req, res) => {
   }
 };
 
-
 const getAllUsers = async (req, res) => {
   try {
     const users = await getAllUsersAsync();
@@ -34,7 +33,7 @@ const getAllUsers = async (req, res) => {
 
 const getUserById = async (req, res) => {
   try {
-    const  id  = req.params.id;
+    const id = req.params.id;
     const user = await getUserByIdAsync(id);
     if (!user) {
       return res.status(404).json({ message: "User not found" });
@@ -46,7 +45,7 @@ const getUserById = async (req, res) => {
     logger.error(`Error: ${error.message}`);
     res.status(500).json({ message: error.message });
   }
-}
+};
 
 const getUserByEmail = async (req, res) => {
   try {
@@ -62,7 +61,35 @@ const getUserByEmail = async (req, res) => {
     logger.error(`Error: ${error.message}`);
     res.status(500).json({ message: error.message });
   }
-}
+};
 
+const loginUser = async (req, res) => {
+  try {
+    const { emailId, password } = req.body;
+    if (!emailId || !password) {
+      return res
+        .status(400)
+        .json({ message: "Email and Password are required" });
+    }
 
-module.exports = {createUser, getAllUsers, getUserById, getUserByEmail};
+    const user = await getUserByEmailAsync(emailId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    if (user.password !== password) {
+      return res.status(401).json({ message: "Invalid Credentials" });
+    }
+    logger.info(`User logged in : ${user.userName} `);
+    return res.status(200).json(user);
+  } catch (error) {
+    logger.error(`Error While Login: ${error.message}`);
+  }
+};
+
+module.exports = {
+  createUser,
+  getAllUsers,
+  getUserById,
+  getUserByEmail,
+  loginUser,
+};
